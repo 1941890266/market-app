@@ -1,32 +1,27 @@
 package com.example.demo;
 
-import com.example.demo.entities.GuPiaoData;
+import com.example.demo.entities.Person;
+import com.example.demo.mapper.PersonMapper;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.data.mongodb.core.MongoTemplate;
-import org.springframework.data.mongodb.core.query.Criteria;
-import org.springframework.data.mongodb.core.query.Query;
-
-import java.util.List;
+import org.springframework.security.crypto.password.PasswordEncoder;
 
 @SpringBootTest
 class DemoApplicationTests {
 
-//    @Autowired
-//    private MongoTemplate mongoTemplate;
+    @Autowired
+    private PasswordEncoder passwordEncoder;
+
+    @Autowired
+    private PersonMapper personMapper;
 
     @Test
-    void test() {
-//        Query query = new Query();
-//        query.addCriteria(Criteria.where("").is(""));
-//        query.limit(100);
-//
-//        List<GuPiaoData> dataList = mongoTemplate.find(query, GuPiaoData.class, "gtd");
-//
-//        System.out.println(dataList.size());
-//
-//        for (GuPiaoData guPiaoData : dataList)
-//            System.out.println(guPiaoData);
+    void contextLoads() {
+//        String username = "admin";
+//        String password = "admin";
+//        String roles = "ROLE_ROOT,ROLE_ADMIN,ROLE_USER";
+//        String encoderPassword = passwordEncoder.encode(password);
+//        personMapper.insertUser(new Person(1, username, encoderPassword, roles));
     }
 }

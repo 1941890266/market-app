@@ -1,10 +1,10 @@
 package com.example.demo.controller;
 
-import com.example.demo.dao.GuPiaoDataDao;
-import com.example.demo.dao.JiJinDataDao;
-import com.example.demo.dao.USAStockDataDao;
+import com.example.demo.dao.*;
+import com.example.demo.entities.ShangZhengShenZhengData;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.mongodb.core.MongoTemplate;
+import org.springframework.stereotype.Component;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -21,14 +21,26 @@ public class GP_JJ_Sum_Controller {
     @Autowired
     private USAStockDataDao usaStockDataDao;
 
+    @Autowired
+    private ShangZhengShenZhengDataDao shangZhengShenZhengDataDao;
+
+    @Autowired
+    private USAFundDataDao usaFundDataDao;
+
     @GetMapping("/gpjjlist")
     public String list(Model model) {
-        Long gpcount = guPiaoDataDao.guPiaoCount();
-        Long uscount = usaStockDataDao.guPiaoCount();
-        Long jjcount = jiJinDataDao.jiJinCount();
-        model.addAttribute("gpcount", gpcount);
-        model.addAttribute("uscount", uscount);
-        model.addAttribute("jjcount", jjcount);
+        Long gpCount = guPiaoDataDao.guPiaoCount();
+        Long usCount = usaStockDataDao.guPiaoCount();
+        Long jjCount = jiJinDataDao.jiJinCount();
+        Long ufCount = usaFundDataDao.jiJinCount();
+        Long shangzhengCount = shangZhengShenZhengDataDao.ShangZhengCount();
+        Long shenzhengCount = shangZhengShenZhengDataDao.ShenZhengCount();
+        model.addAttribute("gpCount", gpCount);
+        model.addAttribute("usCount", usCount);
+        model.addAttribute("jjCount", jjCount);
+        model.addAttribute("ufCount", ufCount);
+        model.addAttribute("shangzhengCount", shangzhengCount);
+        model.addAttribute("shenzhengCount", shenzhengCount);
         return "dashboard";
     }
 }

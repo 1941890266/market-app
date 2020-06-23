@@ -1,67 +1,77 @@
 package com.example.demo.controller;
 
-import com.example.demo.entities.User;
-import com.example.demo.mapper.UserMapper;
+import com.example.demo.entities.Person;
+import com.example.demo.mapper.PersonMapper;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.ArrayList;
 import java.util.List;
 
 @Controller
 public class UserController {
 
     @Autowired
-    private UserMapper userMapper;
+    private PersonMapper personMapper;
 
-    //查询所有用户返回列表页面
+    @Autowired
+    private PasswordEncoder passwordEncoder;
+
     @GetMapping("/users")
-    public String list(Model model){
-        List<User> users = userMapper.getUser();
-        //放在请求域中
+    public String list(Model model) {
+        List<Person> users = new ArrayList<>();
+        for (Person user : personMapper.getUser()) {
+            String[] roles = user.getRoles().split(",");
+            if (roles[0].equals("ROLE_USER")) {
+                user.setPassword("******");
+                users.add(user);
+            }
+        }
         model.addAttribute("users", users);
-        // thymeleaf默认就会拼串
-        // classpath:/templates/xxxx.html
         return "user/list";
     }
 
-    //来到员工添加页面
     @GetMapping("/user/add")
     public String toAddPage(Model model){
-        //来到添加页面,查出所有的部门，在页面显示
         return "user/add";
     }
 
-    //员工添加
-    //SpringMVC自动将请求参数和入参对象的属性进行一一绑定；要求请求参数的名字和javaBean入参的对象里面的属性名是一样的
     @PostMapping("/user/add")
-    public String addOrUpdateUser(User user){
-        //来到员工列表页面
-        System.out.println("保存的员工信息：" + user);
-        //保存员工
-        User u = userMapper.getUserById(user.getId());
-        if (u == null)
-            userMapper.insertUser(user);
-        else
-            userMapper.updateUser(user);
-        // redirect: 表示重定向到一个地址  /代表当前项目路径
-        // forward: 表示转发到一个地址
+    public String addUser(Person user, Model model) {
+        if (!user.getUsername().trim().equals("") && !user.getPassword().trim().equals("")) {
+            if (personMapper.findByUserName(user.getUsername()) != null) {
+                model.addAttribute("msg", "该用户名已存在");
+                return "user/add";
+            }
+            user.setPassword(passwordEncoder.encode(user.getPassword()));
+            personMapper.insertUser(user);
+        }
         return "redirect:/users";
     }
 
-    //来到修改页面，查出当前员工，在页面回显
     @GetMapping("/user/edit/{id}")
-    public String toEditPage(@PathVariable("id") Integer id, Model model){
-        User user = userMapper.getUserById(id);
+    public String toEditPage(@PathVariable("id") Integer id, Model model) {
+        Person user = personMapper.getUserById(id);
+        user.setPassword("请重新填写");
         model.addAttribute("user", user);
         return "user/add";
     }
 
-    //员工删除
-    @GetMapping("/user/delete/{id}")
-    public String deleteEmployee(@PathVariable("id") Integer id){
-        userMapper.deleteUserById(id);
+    @DeleteMapping("/user/delete/{id}")
+    public String deleteUser(@PathVariable("id") Integer id) {
+        personMapper.deleteUserById(id);
+        return "redirect:/users";
+    }
+
+    @PutMapping("/user/add")
+    public String updateUser(Person user) {
+        if (!user.getUsername().trim().equals("") && !user.getPassword().trim().equals("")) {
+            user.setPassword(passwordEncoder.encode(user.getPassword()));
+            personMapper.updateUser(user);
+        }
         return "redirect:/users";
     }
 }
